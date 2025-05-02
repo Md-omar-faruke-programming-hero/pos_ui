@@ -42,7 +42,7 @@ export default function ProductCard({
               skus.map((sku, idx) => (
                 <span
                   key={idx}
-                  className="inline-block px-2 py-1 bg-white border rounded mr-2 cursor-pointer hover:bg-red-100 hover:text-red-600"
+                  className="inline-block  rounded mr-2 cursor-pointer hover:bg-red-100 hover:text-red-600"
                   onClick={() => onDeleteSKU(sku)}
                   title="Click to remove SKU"
                 >
