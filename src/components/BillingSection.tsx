@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Trash2, Plus } from "lucide-react";
 import { useProductSearch } from "../context/ProductSearchContext";
-import { api } from "../api"; // ✅ Make sure this path is correct
+import { api } from "../api";
 
 type PaymentRow = {
   id: number;
@@ -19,8 +19,17 @@ export default function BillingSection() {
   const [rows, setRows] = useState<PaymentRow[]>([{ id: Date.now(), method: "", amount: "" }]);
   const [accounts, setAccounts] = useState<Account[]>([]);
 
+  // Replace these with actual values passed as props or lifted state
+  const invoiceNo = "010520250001";
+  const salesmenId = 4;
+  const phone = "01980552029";
+  const discountType = "Fixed";
+
   const { products, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
     useProductSearch();
+
+  const totalReceived = rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0);
+  const changeAmount = totalReceived - payableAmount;
 
   // Fetch dynamic payment methods
   useEffect(() => {
@@ -45,6 +54,47 @@ export default function BillingSection() {
 
   const handleChange = (id: number, field: keyof PaymentRow, value: string) => {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+  };
+
+  const handleSubmit = async () => {
+    const formattedProducts = products.map((p) => ({
+      variationProductId: p.id,
+      quantity: p.skus.length,
+      unitPrice: p.discountPrice,
+      discount: p.sellPrice - p.discountPrice,
+      subTotal: p.subtotal,
+    }));
+
+    const formattedPayments = rows.map((r) => ({
+      paymentAmount: parseFloat(r.amount),
+      accountId: accounts.find((a) => a.bankName === r.method)?.id || 0,
+    }));
+
+    const skuList = products.flatMap((p) => p.skus);
+
+    const payload = {
+      invoiceNo,
+      salesmenId,
+      discountType,
+      discount: discountAmount,
+      phone,
+      totalPrice,
+      totalPaymentAmount: totalReceived,
+      changeAmount,
+      vat: vatAmount,
+      products: formattedProducts,
+      payments: formattedPayments,
+      sku: skuList,
+    };
+
+    try {
+      const res = await api.post("/sell/create-sell", payload);
+      console.log("✅ Sell created:", res.data);
+      alert("Sell created successfully!");
+    } catch (err) {
+      console.error("❌ Sell submission failed:", err);
+      alert("Sell failed. See console for details.");
+    }
   };
 
   return (
@@ -139,26 +189,27 @@ export default function BillingSection() {
         </div>
         <div className="flex justify-between">
           <span>Total Received Amount</span>
-          <span>
-            {rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0).toFixed(2)}৳
-          </span>
+          <span>{totalReceived.toFixed(2)}৳</span>
         </div>
-        <div className="flex justify-between font-semibold">
-          <span>Change</span>
-          <span>
-            {(
-              (rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0) || 0) -
-              (payableAmount || 0)
-            ).toFixed(2)}
-            ৳
-          </span>
-        </div>
+        {totalReceived < payableAmount ? (
+          <div className="flex justify-between font-semibold">
+            <span>Need</span>
+            <span>{Math.abs(changeAmount).toFixed(2)}৳</span>
+          </div>
+        ) : (
+          <div className="flex justify-between font-semibold">
+            <span>Change</span>
+            <span>{changeAmount.toFixed(2)}৳</span>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 mt-4">
         <button className="btn-red">Cancel & Clear</button>
-        <button className="btn-green">Add POS</button>
+        <button className="btn-green" onClick={handleSubmit}>
+          Add POS
+        </button>
         <button className="btn-dark">Hold</button>
         <button className="btn-brown">Hold List</button>
         <button className="btn-gray">Quotation</button>

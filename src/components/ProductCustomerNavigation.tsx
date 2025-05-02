@@ -7,8 +7,14 @@ export default function ProductCustomerNavigation() {
   const [counter, setCounter] = useState<number>(0);
   const [dateKey, setDateKey] = useState<string>("");
   const [value, setValue] = useState("");
+  //  loding state
+  const [isLoading, setIsLoading] = useState(false);
+  //  check allredy added state
+  const [isDuplicate, setIsDuplicate] = useState(false);
+  //item added state
+  const [isAdded, setIsAdded] = useState(false);
 
-  const { searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
+  const { products, searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
   // Filter only Salesmen
   const salesmen = employees.filter((emp) => emp.employeeDesignation?.designation === "Salesman");
@@ -33,9 +39,38 @@ export default function ProductCustomerNavigation() {
   const invoiceNumber = `${dateKey}${String(counter).padStart(3, "0")}`;
 
   const handleSearch = async () => {
-    await searchBySku(value.trim());
-    setValue("");
+    const trimmed = value.trim();
+    if (trimmed.length !== 11) return;
+  
+    const alreadyExists = products.some(p => p.skus.includes(trimmed));
+    if (alreadyExists) {
+      setIsDuplicate(true);
+      return;
+    }
+  
+    try {
+      setIsDuplicate(false);
+      setIsLoading(true);
+      await searchBySku(trimmed);
+      setIsAdded(true); // ✅ Show message
+      setValue("");
+      setTimeout(() => setIsAdded(false), 2000); // ✅ Hide after 2s
+    } catch (err) {
+      console.error("Search failed", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+  
+
+  useEffect(() => {
+    if (value.trim().length === 11) {
+      handleSearch();
+    }
+    if(value.length==0){
+        setIsDuplicate(false)
+    }
+  }, [value]);
 
   return (
     <div className="bg-white rounded shadow p-4 space-y-4">
@@ -66,6 +101,9 @@ export default function ProductCustomerNavigation() {
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
+          {isLoading && <p className="text-blue-500 text-sm mt-1">Searching product...</p>}
+          {isDuplicate && <p className="text-red-500 text-sm mt-1">Already added</p>}
+          {isAdded && <p className="text-sm text-green-600">Item added</p>}
         </div>
 
         {/* Phone Input */}
