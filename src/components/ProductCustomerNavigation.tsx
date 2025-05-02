@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useProductSearch } from "../context/ProductSearchContext";
 import { useEmployee } from "../context/employeeContext";
+import { useInvoice } from "../context/invoiceContext";
 
 export default function ProductCustomerNavigation() {
-  //  date-state
-  const [counter, setCounter] = useState<number>(0);
-  const [dateKey, setDateKey] = useState<string>("");
   const [value, setValue] = useState("");
   //  loding state
   const [isLoading, setIsLoading] = useState(false);
@@ -13,62 +11,47 @@ export default function ProductCustomerNavigation() {
   const [isDuplicate, setIsDuplicate] = useState(false);
   //item added state
   const [isAdded, setIsAdded] = useState(false);
+  //not found state
+  const [notFound, setNotFound] = useState(false);
 
   const { products, searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
+  const { invoiceNumber, phone, setPhone } = useInvoice();
   // Filter only Salesmen
   const salesmen = employees.filter((emp) => emp.employeeDesignation?.designation === "Salesman");
-  // Generate date-based key: DDMMYYYY000
-  const getTodayKey = (): string => {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, "0");
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const year = today.getFullYear();
-    return `${day}${month}${year}`;
-  };
-
-  useEffect(() => {
-    setDateKey(getTodayKey());
-    setCounter(0);
-  }, []);
-
-  const handleNextInvoice = () => {
-    setCounter((prev) => prev + 1);
-  };
-
-  const invoiceNumber = `${dateKey}${String(counter).padStart(3, "0")}`;
 
   const handleSearch = async () => {
     const trimmed = value.trim();
     if (trimmed.length !== 11) return;
-  
-    const alreadyExists = products.some(p => p.skus.includes(trimmed));
+
+    const alreadyExists = products.some((p) => p.skus.includes(trimmed));
     if (alreadyExists) {
       setIsDuplicate(true);
       return;
     }
-  
+
     try {
       setIsDuplicate(false);
       setIsLoading(true);
       await searchBySku(trimmed);
-      setIsAdded(true); // ✅ Show message
+      setIsAdded(true);
       setValue("");
-      setTimeout(() => setIsAdded(false), 2000); // ✅ Hide after 2s
+      setTimeout(() => setIsAdded(false), 2000);
     } catch (err) {
       console.error("Search failed", err);
+      setNotFound(true);
+      setTimeout(() => setNotFound(false), 2000);
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     if (value.trim().length === 11) {
       handleSearch();
     }
-    if(value.length==0){
-        setIsDuplicate(false)
+    if (value.length == 0) {
+      setIsDuplicate(false);
     }
   }, [value]);
 
@@ -82,12 +65,6 @@ export default function ProductCustomerNavigation() {
           <p className="border border-gray-400 rounded px-4 py-2 text-center text-gray-800">
             {invoiceNumber}
           </p>
-          <button
-            onClick={handleNextInvoice}
-            className="mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Generate Next Invoice
-          </button>
         </div>
 
         {/* SKU Input */}
@@ -104,6 +81,7 @@ export default function ProductCustomerNavigation() {
           {isLoading && <p className="text-blue-500 text-sm mt-1">Searching product...</p>}
           {isDuplicate && <p className="text-red-500 text-sm mt-1">Already added</p>}
           {isAdded && <p className="text-sm text-green-600">Item added</p>}
+          {notFound && <p className="text-red-500 text-sm mt-1">Product not found</p>}
         </div>
 
         {/* Phone Input */}
@@ -112,6 +90,8 @@ export default function ProductCustomerNavigation() {
           <input
             placeholder="Phone"
             type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>

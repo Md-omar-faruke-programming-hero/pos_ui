@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.tsx";
 import { ProductSearchProvider } from "./context/ProductSearchContext.tsx";
 import { EmployeeProvider } from "./context/employeeContext.tsx";
+import { InvoiceProvider } from "./context/invoiceContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ProductSearchProvider>
       <EmployeeProvider>
-        <App />
+        <InvoiceProvider>
+          <App />
+        </InvoiceProvider>
       </EmployeeProvider>
     </ProductSearchProvider>
   </StrictMode>

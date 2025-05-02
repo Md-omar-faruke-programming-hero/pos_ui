@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Trash2, Plus } from "lucide-react";
 import { useProductSearch } from "../context/ProductSearchContext";
+import { useInvoice } from "../context/invoiceContext";
+
 import { api } from "../api";
+import { useEmployee } from "../context/employeeContext";
 
 type PaymentRow = {
   id: number;
@@ -18,20 +21,19 @@ type Account = {
 export default function BillingSection() {
   const [rows, setRows] = useState<PaymentRow[]>([{ id: Date.now(), method: "", amount: "" }]);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Replace these with actual values passed as props or lifted state
-  const invoiceNo = "010520250001";
-  const salesmenId = 4;
-  const phone = "01980552029";
+  
   const discountType = "Fixed";
 
-  const { products, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
+  const { products,setProducts, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
     useProductSearch();
+  const { invoiceNumber, handleNextInvoice, phone } = useInvoice();
+  const { salesmanId } = useEmployee();
 
   const totalReceived = rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0);
   const changeAmount = totalReceived - payableAmount;
 
-  // Fetch dynamic payment methods
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
@@ -57,6 +59,7 @@ export default function BillingSection() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     const formattedProducts = products.map((p) => ({
       variationProductId: p.id,
       quantity: p.skus.length,
@@ -70,11 +73,11 @@ export default function BillingSection() {
       accountId: accounts.find((a) => a.bankName === r.method)?.id || 0,
     }));
 
-    const skuList = products.flatMap((p) => p.skus);
+    const skuList = products.flatMap((p) => (Array.isArray(p.skus) ? p.skus : []));
 
     const payload = {
-      invoiceNo,
-      salesmenId,
+      invoiceNo: invoiceNumber,
+      salesmenId: salesmanId,
       discountType,
       discount: discountAmount,
       phone,
@@ -86,20 +89,24 @@ export default function BillingSection() {
       payments: formattedPayments,
       sku: skuList,
     };
+    console.log("/sell/create-sell",payload)
 
     try {
       const res = await api.post("/sell/create-sell", payload);
       console.log("✅ Sell created:", res.data);
       alert("Sell created successfully!");
+      handleNextInvoice();
+      setProducts([]);
     } catch (err) {
       console.error("❌ Sell submission failed:", err);
       alert("Sell failed. See console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="bg-white rounded shadow p-4">
-      {/* Summary Section */}
       <div className="space-y-1">
         <div className="flex justify-between border-b-[1px]">
           <span>Maximum Retail Price (MRP)</span>
@@ -127,7 +134,6 @@ export default function BillingSection() {
         </div>
       </div>
 
-      {/* Payment Rows Section */}
       <div className="space-y-4 mt-4">
         {rows.map((row, index) => (
           <div key={row.id} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
@@ -181,7 +187,6 @@ export default function BillingSection() {
         ))}
       </div>
 
-      {/* Total Calculation Section */}
       <div className="mt-4 space-y-1">
         <div className="flex justify-between">
           <span>Payable Amount</span>
@@ -204,11 +209,10 @@ export default function BillingSection() {
         )}
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 mt-4">
         <button className="btn-red">Cancel & Clear</button>
-        <button className="btn-green" onClick={handleSubmit}>
-          Add POS
+        <button className="btn-green" onClick={handleSubmit} disabled={loading}>
+          {loading ? "Processing..." : "Add POS"}
         </button>
         <button className="btn-dark">Hold</button>
         <button className="btn-brown">Hold List</button>
