@@ -5,8 +5,63 @@ type ProductCardProps = {
   subtotal: number;
   stock: number;
   skus: string[];
+  index: number;
+  onDelete: () => void;
+  onDeleteSKU: (sku: string) => void;
 };
 
+// export default function ProductCard({
+//   name,
+//   size,
+//   price,
+//   subtotal,
+//   stock,
+//   skus,
+// }: ProductCardProps) {
+//   return (
+//     <div className="bg-gray-100 rounded p-4 relative">
+//       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+//         <div>
+//           <p>
+//             <strong>Name</strong> {name}
+//           </p>
+//           <p>
+//             <strong>Size</strong> {size}
+//           </p>
+//           <p>
+//             <strong>Color</strong> Not found
+//           </p>
+//           <p>
+//             <strong>Available Stock</strong> {stock} Units
+//           </p>
+//           <p>
+//             <strong>SKU</strong>{" "}
+//             {skus.map((sku, idx) => (
+//               <span key={idx} className="inline-block   cursor-pointer mr-[5px]">
+//                 {sku}
+//               </span>
+//             ))}
+//           </p>
+//         </div>
+
+//         <div className="flex justify-between items-center mt-2 ">
+//           <div className="relative flex items-center w-[160px] mr-[10px] bg-white">
+//             <p className="input   ">{`Tk. ${price}`}</p>
+//             <span className="absolute  left-[85px]">
+//               <del>300</del>
+//             </span>
+//           </div>
+//           <span className="font-semibold">Subtotal: Tk. {subtotal.toFixed(2)}</span>
+//         </div>
+//         <div>
+//           <button className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white rounded p-1 hover:bg-red-700">
+//             🗑
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 export default function ProductCard({
   name,
   size,
@@ -14,6 +69,8 @@ export default function ProductCard({
   subtotal,
   stock,
   skus,
+  onDelete,
+  onDeleteSKU,
 }: ProductCardProps) {
   return (
     <div className="bg-gray-100 rounded p-4 relative">
@@ -33,25 +90,40 @@ export default function ProductCard({
           </p>
           <p>
             <strong>SKU</strong>{" "}
-            {skus.map((sku, idx) => (
-              <span key={idx} className="inline-block   cursor-pointer mr-[5px]">
-                {sku}
-              </span>
-            ))}
+            {skus.length > 0 ? (
+              skus.map((sku, idx) => (
+                <span
+                  key={idx}
+                  className="inline-block px-2 py-1 bg-white border rounded mr-2 cursor-pointer hover:bg-red-100 hover:text-red-600"
+                  onClick={() => onDeleteSKU(sku)}
+                  title="Click to remove SKU"
+                >
+                  {sku}
+                </span>
+              ))
+            ) : (
+              <span className="text-red-500">No SKU</span>
+            )}
           </p>
         </div>
 
-        <div className="flex justify-between items-center mt-2 ">
+        <div className="flex justify-between items-center mt-2">
           <div className="relative flex items-center w-[160px] mr-[10px] bg-white">
-            <p className="input   ">{`Tk. ${price}`}</p>
-            <span className="absolute  left-[85px]">
+            <p className="input">{`Tk. ${price}`}</p>
+            <span className="absolute left-[85px]">
               <del>300</del>
             </span>
           </div>
-          <span className="font-semibold">Subtotal: Tk. {subtotal.toFixed(2)}</span>
+          <span className="font-semibold">
+            Subtotal: Tk. {subtotal.toFixed(2)}
+          </span>
         </div>
+
         <div>
-          <button className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white rounded p-1 hover:bg-red-700">
+          <button
+            onClick={onDelete}
+            className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white rounded p-1 hover:bg-red-700"
+          >
             🗑
           </button>
         </div>
