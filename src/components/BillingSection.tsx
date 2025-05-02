@@ -1,19 +1,42 @@
-import { useState } from "react";
-import { Trash2, Plus } from "lucide-react"; // Optional: You can use emojis/icons too
+import { useEffect, useState } from "react";
+import { Trash2, Plus } from "lucide-react";
 import { useProductSearch } from "../context/ProductSearchContext";
+import { api } from "../api"; // ✅ Make sure this path is correct
 
 type PaymentRow = {
   id: number;
   method: string;
   amount: string;
 };
+
+type Account = {
+  id: number;
+  bankName: string;
+  accountName: string;
+};
+
 export default function BillingSection() {
-  const [rows, setRows] = useState<PaymentRow[]>([{ id: Date.now(), method: "Cash", amount: "" }]);
+  const [rows, setRows] = useState<PaymentRow[]>([{ id: Date.now(), method: "", amount: "" }]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
   const { products, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
     useProductSearch();
 
+  // Fetch dynamic payment methods
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const res = await api.get("/account/get-accounts?type=All");
+        setAccounts(res.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch payment methods:", error);
+      }
+    };
+    fetchAccounts();
+  }, []);
+
   const addRow = () => {
-    setRows((prev) => [...prev, { id: Date.now(), method: "Cash", amount: "" }]);
+    setRows((prev) => [...prev, { id: Date.now(), method: "", amount: "" }]);
   };
 
   const removeRow = (id: number) => {
@@ -23,8 +46,10 @@ export default function BillingSection() {
   const handleChange = (id: number, field: keyof PaymentRow, value: string) => {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
+
   return (
     <div className="bg-white rounded shadow p-4">
+      {/* Summary Section */}
       <div className="space-y-1">
         <div className="flex justify-between border-b-[1px]">
           <span>Maximum Retail Price (MRP)</span>
@@ -46,11 +71,13 @@ export default function BillingSection() {
           <span>Total Items Quantity</span>
           <span>{totalSKUs}</span>
         </div>
-        <div className="flex justify-between font-bold text-lg ">
+        <div className="flex justify-between font-bold text-lg">
           <span>Total Payable Amount</span>
           <span>{payableAmount}৳</span>
         </div>
       </div>
+
+      {/* Payment Rows Section */}
       <div className="space-y-4 mt-4">
         {rows.map((row, index) => (
           <div key={row.id} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
@@ -71,23 +98,31 @@ export default function BillingSection() {
                 </button>
               )}
             </div>
+
             <div>
               <label className="block mb-1">Choose The Method</label>
               <select
-                className="input mt-[5px]"
+                className="input mt-[5px] w-full"
                 value={row.method}
                 onChange={(e) => handleChange(row.id, "method", e.target.value)}
               >
-                <option value="Islami Bank">Islami Bank</option>
-                <option value="Cash">Cash</option>
-                <option value="Bkash">Bkash</option>
+                <option value="" disabled>
+                  Select Method
+                </option>
+                {accounts.map((account) => (
+                  <option key={account.id} value={account.bankName}>
+                    {account.bankName}
+                  </option>
+                ))}
               </select>
             </div>
+
             <div>
               <label className="block mb-1">Enter Payment Amount *</label>
               <input
-                className="input mt-2"
+                className="input mt-2 w-full"
                 placeholder="Enter Payment Amount"
+                type="number"
                 value={row.amount}
                 onChange={(e) => handleChange(row.id, "amount", e.target.value)}
               />
@@ -96,21 +131,31 @@ export default function BillingSection() {
         ))}
       </div>
 
+      {/* Total Calculation Section */}
       <div className="mt-4 space-y-1">
         <div className="flex justify-between">
           <span>Payable Amount</span>
-          <span>4000.00৳</span>
+          <span>{payableAmount}৳</span>
         </div>
         <div className="flex justify-between">
           <span>Total Received Amount</span>
-          <span>5000.00৳</span>
+          <span>
+            {rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0).toFixed(2)}৳
+          </span>
         </div>
         <div className="flex justify-between font-semibold">
           <span>Change</span>
-          <span>1000.00৳</span>
+          <span>
+            {(
+              (rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0) || 0) -
+              (payableAmount || 0)
+            ).toFixed(2)}
+            ৳
+          </span>
         </div>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 mt-4">
         <button className="btn-red">Cancel & Clear</button>
         <button className="btn-green">Add POS</button>
