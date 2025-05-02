@@ -54,14 +54,7 @@ export default function ProductInfoList() {
   };
 
   return (
-    // <div className="bg-white rounded shadow p-4 space-y-4">
-    //   <h2 className="text-lg font-semibold">Products Information</h2>
-    //   <div className="space-y-4">
-    //     {products.map((prod, index) => (
-    //       <ProductCard key={index} {...prod} />
-    //     ))}
-    //   </div>
-    // </div>
+    
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Products Information</h2>
       <div className="space-y-4">
