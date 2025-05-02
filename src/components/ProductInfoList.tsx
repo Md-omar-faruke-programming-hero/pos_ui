@@ -1,40 +1,8 @@
+import { useProductSearch } from "../context/ProductSearchContext";
 import ProductCard from "./ProductCard";
-import { useState } from "react";
-type Product = {
-  name: string;
-  size: string;
-  price: number;
-  subtotal: number;
-  stock: number;
-  skus: string[];
-};
+
 export default function ProductInfoList() {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      name: "SI-801",
-      size: "SM",
-      price: 350,
-      subtotal: 700,
-      stock: 10,
-      skus: ["00015", "00016"],
-    },
-    {
-      name: "SI-101",
-      size: "SM",
-      price: 450,
-      subtotal: 900,
-      stock: 30,
-      skus: ["00143", "00144"],
-    },
-    {
-      name: "SI-101",
-      size: "XL",
-      price: 12000,
-      subtotal: 2400,
-      stock: 138,
-      skus: ["00025", "00026", "00027"],
-    },
-  ]);
+  const { products, setProducts } = useProductSearch();
 
   const deleteProduct = (index: number) => {
     setProducts((prev) => prev.filter((_, i) => i !== index));
@@ -44,21 +12,23 @@ export default function ProductInfoList() {
     setProducts((prev) => {
       const newProducts = [...prev];
       const updatedSkus = newProducts[productIndex].skus.filter((s) => s !== sku);
-
+  
       if (updatedSkus.length === 0) {
-        // Remove the entire product if no SKUs left
+        // Remove the product entirely if no SKUs left
         newProducts.splice(productIndex, 1);
       } else {
-        // Update only the SKU list
+        const discountPrice = newProducts[productIndex].discountPrice;
         newProducts[productIndex] = {
           ...newProducts[productIndex],
           skus: updatedSkus,
+          subtotal: updatedSkus.length * discountPrice, 
         };
       }
-
+  
       return newProducts;
     });
   };
+  
   return (
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Products Information</h2>

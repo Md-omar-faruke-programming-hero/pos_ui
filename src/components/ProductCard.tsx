@@ -1,22 +1,20 @@
-type ProductCardProps = {
-  name: string;
-  size: string;
-  price: number;
-  subtotal: number;
-  stock: number;
-  skus: string[];
+import type { Product } from "../context/productTypes";
+
+type ProductCardProps = Product & {
+  subtotal:number;
   index: number;
   onDelete: () => void;
   onDeleteSKU: (sku: string) => void;
 };
 
 export default function ProductCard({
-  name,
+  productName,
   size,
-  price,
-  subtotal,
+  sellPrice,
+  discountPrice,
   stock,
   skus,
+  subtotal,
   onDelete,
   onDeleteSKU,
 }: ProductCardProps) {
@@ -25,7 +23,7 @@ export default function ProductCard({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <p>
-            <strong>Name</strong> {name}
+            <strong>Name</strong> {productName}
           </p>
           <p>
             <strong>Size</strong> {size}
@@ -56,13 +54,20 @@ export default function ProductCard({
         </div>
 
         <div className="flex justify-between items-center mt-2">
-          <div className="relative flex items-center w-[160px] mr-[10px] bg-white">
-            <p className="input">{`Tk. ${price}`}</p>
-            <span className="absolute left-[85px]">
-              <del>300</del>
-            </span>
-          </div>
-          <span className="font-semibold">Subtotal: Tk. {subtotal.toFixed(2)}</span>
+          {discountPrice == sellPrice ? (
+            <div className="relative flex items-center w-[160px] mr-[10px] bg-white">
+              <p className="input">{`Tk. ${discountPrice}`}</p>
+            </div>
+          ) : (
+            <div className="relative flex items-center w-[160px] mr-[10px] bg-white">
+              <p className="input">{`Tk. ${discountPrice}`}</p>
+              <span className="absolute left-[85px]">
+                <del>{sellPrice}</del>
+              </span>
+            </div>
+          )}
+
+          <span className="font-semibold">Subtotal: Tk {subtotal.toFixed(2)}</span>
         </div>
 
         <div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Trash2, Plus } from "lucide-react"; // Optional: You can use emojis/icons too
+import { useProductSearch } from "../context/ProductSearchContext";
 
 type PaymentRow = {
   id: number;
@@ -8,6 +9,8 @@ type PaymentRow = {
 };
 export default function BillingSection() {
   const [rows, setRows] = useState<PaymentRow[]>([{ id: Date.now(), method: "Cash", amount: "" }]);
+  const { products, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
+    useProductSearch();
 
   const addRow = () => {
     setRows((prev) => [...prev, { id: Date.now(), method: "Cash", amount: "" }]);
@@ -25,27 +28,27 @@ export default function BillingSection() {
       <div className="space-y-1">
         <div className="flex justify-between border-b-[1px]">
           <span>Maximum Retail Price (MRP)</span>
-          <span>4000.00৳</span>
+          <span>{totalPrice}৳</span>
         </div>
         <div className="flex justify-between border-b-[1px]">
           <span>(+) Vat/Tax</span>
-          <span>0.00৳</span>
+          <span>{vatAmount}৳</span>
         </div>
         <div className="flex justify-between border-b-[1px]">
           <span>(–) Discount</span>
-          <span>0.00৳</span>
+          <span>{discountAmount}৳</span>
         </div>
         <div className="flex justify-between border-b-[1px]">
           <span>Number of Items</span>
-          <span>3</span>
+          <span>{products?.length}</span>
         </div>
         <div className="flex justify-between border-b-[1px]">
           <span>Total Items Quantity</span>
-          <span>6</span>
+          <span>{totalSKUs}</span>
         </div>
         <div className="flex justify-between font-bold text-lg ">
           <span>Total Payable Amount</span>
-          <span>4000.00৳</span>
+          <span>{payableAmount}৳</span>
         </div>
       </div>
       <div className="space-y-4 mt-4">

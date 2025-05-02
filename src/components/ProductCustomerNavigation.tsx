@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
+import { useProductSearch } from "../context/ProductSearchContext";
+
+//import { api } from "../api";
+
 export default function ProductCustomerNavigation() {
+  //  date-state
   const [counter, setCounter] = useState<number>(0);
   const [dateKey, setDateKey] = useState<string>("");
+  //  sku-state
+  //const [sku, setSku] = useState("");
+  //  product-state
+  //const [product, setProduct] = useState<any>(null);
+  const [value, setValue] = useState("");
+  const { products, searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
+  console.log(products);
 
   // Generate date-based key: DDMMYYYY000
   const getTodayKey = (): string => {
@@ -19,6 +31,14 @@ export default function ProductCustomerNavigation() {
     setCounter((prev) => prev + 1);
   };
   const invoiceNumber = `${dateKey}${String(counter).padStart(3, "0")}`;
+
+  //sku search function
+  const handleSearch = async () => {
+    await searchBySku(value.trim());
+    setValue("");
+  };
+
+  console.log(value.trim());
   return (
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Product & Customer Navigation</h2>
@@ -47,6 +67,9 @@ export default function ProductCustomerNavigation() {
             type="text"
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Name / BarCode"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
         </div>
         <div className="flex flex-col space-y-1 w-[auto]">
@@ -91,6 +114,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Discount Amount</label>
           <input
+            onChange={(e) => setDiscountAmount(Number(e.target.value))}
             placeholder="Enter The Discount Amount"
             type="text"
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -99,6 +123,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Vat Amount</label>
           <input
+            onChange={(e) => setVatAmount(Number(e.target.value))}
             placeholder="Enter The Vat Amount"
             type="text"
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
