@@ -83,7 +83,6 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
         setProducts,
         totalPrice,
         totalSKUs,
-
         payableAmount,
         setDiscountAmount,
         setVatAmount,

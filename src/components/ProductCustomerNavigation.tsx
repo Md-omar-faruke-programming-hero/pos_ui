@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
 import { useProductSearch } from "../context/ProductSearchContext";
-
-//import { api } from "../api";
+import { useEmployee } from "../context/employeeContext";
 
 export default function ProductCustomerNavigation() {
   //  date-state
   const [counter, setCounter] = useState<number>(0);
   const [dateKey, setDateKey] = useState<string>("");
-  //  sku-state
-  //const [sku, setSku] = useState("");
-  //  product-state
-  //const [product, setProduct] = useState<any>(null);
   const [value, setValue] = useState("");
-  const { products, searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
-  console.log(products);
 
+  const { searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
+  const { employees, salesmanId, setSalesmanId } = useEmployee();
+  // Filter only Salesmen
+  const salesmen = employees.filter((emp) => emp.employeeDesignation?.designation === "Salesman");
   // Generate date-based key: DDMMYYYY000
   const getTodayKey = (): string => {
     const today = new Date();
@@ -23,32 +20,28 @@ export default function ProductCustomerNavigation() {
     const year = today.getFullYear();
     return `${day}${month}${year}`;
   };
+
   useEffect(() => {
     setDateKey(getTodayKey());
-    setCounter(0); // reset counter on initial load or date change
+    setCounter(0);
   }, []);
+
   const handleNextInvoice = () => {
     setCounter((prev) => prev + 1);
   };
+
   const invoiceNumber = `${dateKey}${String(counter).padStart(3, "0")}`;
 
-  //sku search function
   const handleSearch = async () => {
     await searchBySku(value.trim());
     setValue("");
   };
 
-  console.log(value.trim());
   return (
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Product & Customer Navigation</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* <div className="flex flex-col space-y-1 w-[auto]">
-          <label className="text-sm font-semibold text-gray-700">Invoice Number</label>
-          <p className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            123454678676
-          </p>
-        </div> */}
+        {/* Invoice */}
         <div className="flex flex-col space-y-2 w-auto items-center">
           <label className="text-sm font-semibold text-gray-700">Invoice Number</label>
           <p className="border border-gray-400 rounded px-4 py-2 text-center text-gray-800">
@@ -61,6 +54,8 @@ export default function ProductCustomerNavigation() {
             Generate Next Invoice
           </button>
         </div>
+
+        {/* SKU Input */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Product BarCode *</label>
           <input
@@ -72,6 +67,8 @@ export default function ProductCustomerNavigation() {
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
         </div>
+
+        {/* Phone Input */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Phone</label>
           <input
@@ -80,6 +77,8 @@ export default function ProductCustomerNavigation() {
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
+
+        {/* Membership ID */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">MemberShipID</label>
           <input
@@ -88,17 +87,27 @@ export default function ProductCustomerNavigation() {
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
-        <div className="flex flex-col space-y-1 w-[auto]">
+
+        {/* Salesman Dropdown */}
+        <div className="flex flex-col space-y-1 w-auto">
           <label className="text-sm font-semibold text-gray-700">Select Sales Person *</label>
           <select
+            value={salesmanId ?? ""}
+            onChange={(e) => setSalesmanId(Number(e.target.value))}
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            defaultValue="fixed"
           >
-            <option value="fixed">Rifat </option>
-            <option value="percentage">omar</option>
-            <option value="none">Noman</option>
+            <option value="" disabled>
+              Select a Salesman
+            </option>
+            {salesmen.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.firstName || "Unnamed"} {emp.lastName ?? ""}
+              </option>
+            ))}
           </select>
         </div>
+
+        {/* Discount Type */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Select Discount Type</label>
           <select
@@ -111,6 +120,7 @@ export default function ProductCustomerNavigation() {
           </select>
         </div>
 
+        {/* Discount Amount */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Discount Amount</label>
           <input
@@ -120,6 +130,8 @@ export default function ProductCustomerNavigation() {
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
+
+        {/* VAT Amount */}
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Vat Amount</label>
           <input
