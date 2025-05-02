@@ -23,10 +23,9 @@ export default function BillingSection() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(false);
 
-  
   const discountType = "Fixed";
 
-  const { products,setProducts, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
+  const { products, setProducts, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
     useProductSearch();
   const { invoiceNumber, handleNextInvoice, phone } = useInvoice();
   const { salesmanId } = useEmployee();
@@ -59,49 +58,53 @@ export default function BillingSection() {
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
-    const formattedProducts = products.map((p) => ({
-      variationProductId: p.id,
-      quantity: p.skus.length,
-      unitPrice: p.discountPrice,
-      discount: p.sellPrice - p.discountPrice,
-      subTotal: p.subtotal,
-    }));
+    if (totalReceived >= payableAmount) {
+      setLoading(true);
+      const formattedProducts = products.map((p) => ({
+        variationProductId: p.id,
+        quantity: p.skus.length,
+        unitPrice: p.discountPrice,
+        discount: p.sellPrice - p.discountPrice,
+        subTotal: p.subtotal,
+      }));
 
-    const formattedPayments = rows.map((r) => ({
-      paymentAmount: parseFloat(r.amount),
-      accountId: accounts.find((a) => a.bankName === r.method)?.id || 0,
-    }));
+      const formattedPayments = rows.map((r) => ({
+        paymentAmount: parseFloat(r.amount),
+        accountId: accounts.find((a) => a.bankName === r.method)?.id || 0,
+      }));
 
-    const skuList = products.flatMap((p) => (Array.isArray(p.skus) ? p.skus : []));
+      const skuList = products.flatMap((p) => (Array.isArray(p.skus) ? p.skus : []));
 
-    const payload = {
-      invoiceNo: invoiceNumber,
-      salesmenId: salesmanId,
-      discountType,
-      discount: discountAmount,
-      phone,
-      totalPrice,
-      totalPaymentAmount: totalReceived,
-      changeAmount,
-      vat: vatAmount,
-      products: formattedProducts,
-      payments: formattedPayments,
-      sku: skuList,
-    };
-    console.log("/sell/create-sell",payload)
+      const payload = {
+        invoiceNo: invoiceNumber,
+        salesmenId: salesmanId,
+        discountType,
+        discount: discountAmount,
+        phone,
+        totalPrice,
+        totalPaymentAmount: totalReceived,
+        changeAmount,
+        vat: vatAmount,
+        products: formattedProducts,
+        payments: formattedPayments,
+        sku: skuList,
+      };
+      console.log("/sell/create-sell", payload);
 
-    try {
-      const res = await api.post("/sell/create-sell", payload);
-      console.log("✅ Sell created:", res.data);
-      alert("Sell created successfully!");
-      handleNextInvoice();
-      setProducts([]);
-    } catch (err) {
-      console.error("❌ Sell submission failed:", err);
-      alert("Sell failed. See console for details.");
-    } finally {
-      setLoading(false);
+      try {
+        const res = await api.post("/sell/create-sell", payload);
+        console.log("✅ Sell created:", res.data);
+        alert("Sell created successfully!");
+        handleNextInvoice();
+        setProducts([]);
+      } catch (err) {
+        console.error("❌ Sell submission failed:", err);
+        alert("Sell failed. See console for details.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert("Need Amount");
     }
   };
 
@@ -211,7 +214,7 @@ export default function BillingSection() {
 
       <div className="flex flex-wrap gap-2 mt-4">
         <button className="btn-red">Cancel & Clear</button>
-        <button className="btn-green" onClick={handleSubmit} disabled={loading}>
+        <button className="btn-green cursor-pointer" onClick={handleSubmit} disabled={loading}>
           {loading ? "Processing..." : "Add POS"}
         </button>
         <button className="btn-dark">Hold</button>

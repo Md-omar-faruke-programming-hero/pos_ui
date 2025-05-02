@@ -14,7 +14,8 @@ export default function ProductCustomerNavigation() {
   //not found state
   const [notFound, setNotFound] = useState(false);
 
-  const { products, searchBySku, setDiscountAmount, setVatAmount } = useProductSearch();
+  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership } =
+    useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
   const { invoiceNumber, phone, setPhone } = useInvoice();
   // Filter only Salesmen
@@ -100,6 +101,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">MemberShipID</label>
           <input
+            onChange={(e) => setMembership?.(e.target.value)}
             placeholder="MemberShipID"
             type="text"
             className="border border-gray-400 rounded px-3 py-1.5 text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400"

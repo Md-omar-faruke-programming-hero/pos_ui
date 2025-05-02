@@ -10,6 +10,8 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [vatAmount, setVatAmount] = useState<number>(0);
 
+  const [membership, setMembership] = useState<string>("");
+
   // Maximum Retail Price (MRP) fine here
   const totalPrice = products.reduce((acc, p) => acc + p.subtotal, 0);
   // total item quantity
@@ -24,7 +26,9 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const found = res.data.data?.[0];
-      if (!found) return;
+      if (!found) {
+        throw new Error("Product not found");
+      }
 
       setProducts((prev) => {
         const matchIndex = prev.findIndex(
@@ -65,13 +69,14 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
               wholePrice: found.wholePrice,
               unique: found.unique,
               skus: [found.sku],
-              subtotal: found.discountPrice, // 1 SKU × discountPrice
+              subtotal: found.discountPrice,
             },
           ];
         }
       });
     } catch (err) {
       console.error("SKU search failed", err);
+      throw err;
     }
   };
 
@@ -88,6 +93,8 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
         setVatAmount,
         discountAmount,
         vatAmount,
+        membership,
+        setMembership,
       }}
     >
       {children}
