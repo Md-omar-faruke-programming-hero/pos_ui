@@ -140,6 +140,7 @@ export default function BillingSection() {
 
         clearPOSState();
         setProducts([]);
+        setRows([{ id: Date.now(), method: "", amount: "" }]);
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
@@ -155,6 +156,7 @@ export default function BillingSection() {
   const clearProducts = () => {
     setProducts([]);
     clearPOSState();
+    setRows([{ id: Date.now(), method: "", amount: "" }]);
   };
 
   // hold  handler
