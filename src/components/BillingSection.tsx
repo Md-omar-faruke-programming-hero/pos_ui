@@ -141,7 +141,7 @@ export default function BillingSection() {
         
         clearPOSState();
         setProducts([]);
-        setRows([]);
+        
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
@@ -157,7 +157,7 @@ export default function BillingSection() {
   const clearProducts = () => {
     setProducts([]);
     clearPOSState();
-    setRows([]);
+   
   };
 
   // hold  handler
