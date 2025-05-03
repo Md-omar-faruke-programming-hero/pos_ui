@@ -194,7 +194,7 @@ export default function BillingSection() {
       
     const isvalid= products.length==0;
     if(isvalid){
-      alert("Nothing to add ");
+      alert("Nothing to add on hold");
       return;
     }
     const heldSales = JSON.parse(localStorage.getItem("heldSales") || "[]");
