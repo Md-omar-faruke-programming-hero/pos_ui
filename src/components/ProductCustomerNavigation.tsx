@@ -26,7 +26,7 @@ export default function ProductCustomerNavigation() {
     membership,
   } = useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
-  const { phone, setPhone, invoiceNumber } = useInvoice();
+  const { phone, setPhone, invoiceNumber, restorinv } = useInvoice();
   // Filter only Salesmen
   const salesmen = employees.filter((emp) => emp.employeeDesignation?.designation === "Salesman");
 
@@ -72,7 +72,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-auto ">
           <label className="text-sm font-semibold text-gray-700">Invoice Number</label>
           <p className="border border-gray-400 rounded px-4 py-2 text-center text-gray-800">
-            {invoiceNumber}
+            {restorinv ? restorinv : invoiceNumber}
           </p>
         </div>
 

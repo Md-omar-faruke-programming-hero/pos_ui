@@ -59,7 +59,7 @@ export default function BillingSection() {
     setVatAmount,
     setValue,
   } = useProductSearch();
-  const { invoiceNumber, handleNextInvoice, phone, setPhone } = useInvoice();
+  const { invoiceNumber, handleNextInvoice, phone, setPhone, setRestorinv } = useInvoice();
   const { salesmanId, setSalesmanId } = useEmployee();
 
   const totalReceived = rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0);
@@ -98,6 +98,7 @@ export default function BillingSection() {
     setVatAmount(0);
     setSalesmanId(null);
     setValue("");
+    setRestorinv("");
   };
   const handleSubmit = async () => {
     if (totalReceived >= payableAmount) {
@@ -223,11 +224,12 @@ export default function BillingSection() {
   };
 
   const handleRestore = (invoice: HoldInvoice) => {
+    console.log(invoice);
     const mappedProducts: Product[] = invoice.products.map((p) => ({
-      id: p.variationProductId, // assuming this is your variation product ID
+      id: p.variationProductId, 
       branchId: 0,
       productId: 0,
-      productName: "", // optional: if you want to store and retrieve this later
+      productName: "", 
       size: "",
       color: null,
       stock: 0,
@@ -242,8 +244,10 @@ export default function BillingSection() {
       skus: invoice.sku || [],
       subtotal: p.subTotal,
     }));
-
+   
     setProducts(mappedProducts);
+    setRestorinv(invoice.invoiceNo)
+   
     setModalOpen(false);
   };
 
