@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 interface InvoiceContextProps {
   invoiceNumber: string;
+
   handleNextInvoice: () => void;
   setPhone: (phone: string) => void;
   phone: string;
@@ -21,18 +22,21 @@ export const InvoiceProvider = ({ children }: { children: React.ReactNode }) => 
   const [counter, setCounter] = useState<number>(0);
   const [dateKey, setDateKey] = useState<string>("");
   const [phone, setPhone] = useState("");
+ 
 
-  useEffect(() => {
-    setDateKey(getTodayKey());
-    setCounter(0);
-  }, []);
+  
 
   const handleNextInvoice = () => {
     setCounter((prev) => prev + 1);
   };
 
   const invoiceNumber = `${dateKey}${String(counter).padStart(3, "0")}`;
-
+  
+  useEffect(() => {
+    setDateKey(getTodayKey());
+    setCounter(0);
+    
+  }, []);
   return (
     <InvoiceContext.Provider value={{ invoiceNumber, handleNextInvoice,phone, setPhone  }}>
       {children}

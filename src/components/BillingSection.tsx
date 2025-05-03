@@ -5,6 +5,8 @@ import { useInvoice } from "../context/invoiceContext";
 
 import { api } from "../api";
 import { useEmployee } from "../context/employeeContext";
+import { HoldListModal, HoldInvoice } from "./HoldListModal";
+// import type { Product as ContextProduct } from "../context/productTypes";
 
 type PaymentRow = {
   id: number;
@@ -16,6 +18,25 @@ type Account = {
   id: number;
   bankName: string;
   accountName: string;
+};
+export type Product = {
+  id: number;
+  branchId: number;
+  productId: number;
+  productName: string;
+  size: string;
+  color: string | null;
+  stock: number;
+  category: string;
+  subCategory: string;
+  price: number;
+  sellPrice: number;
+  discount: number;
+  discountPrice: number;
+  wholePrice: number;
+  unique: boolean;
+  skus: string[];
+  subtotal: number;
 };
 
 export default function BillingSection() {
@@ -173,6 +194,52 @@ export default function BillingSection() {
     alert("Hold  successfully!");
   };
 
+  // hold list  handler
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [holdList, setHoldList] = useState<HoldInvoice[]>([]);
+  const openHoldList = () => {
+    const stored = localStorage.getItem("heldSales");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setHoldList(parsed);
+        setModalOpen(true);
+      } catch (err) {
+        console.error("Invalid hold data", err);
+      }
+    }
+  };
+
+  const handleRestore = (invoice: HoldInvoice) => {
+    const mappedProducts: Product[] = invoice.products.map((p) => ({
+      id: p.variationProductId, // assuming this is your variation product ID
+      branchId: 0,
+      productId: 0,
+      productName: "", // optional: if you want to store and retrieve this later
+      size: "",
+      color: null,
+      stock: 0,
+      category: "",
+      subCategory: "",
+      price: p.unitPrice + p.discount,
+      sellPrice: p.unitPrice + p.discount,
+      discount: p.discount,
+      discountPrice: p.unitPrice,
+      wholePrice: 0,
+      unique: false,
+      skus: invoice.sku || [],
+      subtotal: p.subTotal,
+    }));
+    
+    setProducts(mappedProducts);
+    setModalOpen(false)
+  };
+
+  const handleDelete = (timestamp: string) => {
+    const updated = holdList.filter((item) => item.timestamp !== timestamp);
+    setHoldList(updated);
+    localStorage.setItem("heldSales", JSON.stringify(updated));
+  };
   return (
     <div className="bg-white rounded shadow p-4">
       <div className="space-y-1">
@@ -287,12 +354,21 @@ export default function BillingSection() {
         <button onClick={handleHold} className="btn-dark">
           Hold
         </button>
-        <button className="btn-brown">Hold List</button>
+        <button onClick={openHoldList} className="btn-brown">
+          Hold List
+        </button>
         <button className="btn-gray">Quotation</button>
         <button className="btn-light">Reattempt</button>
         <button className="btn-blue">SMS</button>
         <button className="btn-black">Reprint</button>
       </div>
+      <HoldListModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onRestore={handleRestore}
+        onDelete={handleDelete}
+        holdList={holdList}
+      />
     </div>
   );
 }

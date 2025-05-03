@@ -4,7 +4,6 @@ import { useEmployee } from "../context/employeeContext";
 import { useInvoice } from "../context/invoiceContext";
 
 export default function ProductCustomerNavigation() {
-  
   //  loding state
   const [isLoading, setIsLoading] = useState(false);
   //  check allredy added state
@@ -14,10 +13,10 @@ export default function ProductCustomerNavigation() {
   //not found state
   const [notFound, setNotFound] = useState(false);
 
-  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership,value, setValue } =
+  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership, value, setValue } =
     useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
-  const { invoiceNumber, phone, setPhone } = useInvoice();
+  const { phone, setPhone, invoiceNumber } = useInvoice();
   // Filter only Salesmen
   const salesmen = employees.filter((emp) => emp.employeeDesignation?.designation === "Salesman");
 
@@ -60,8 +59,8 @@ export default function ProductCustomerNavigation() {
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Product & Customer Navigation</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Invoice */}
-        <div className="flex flex-col space-y-2 w-auto items-center">
+        
+        <div className="flex flex-col space-y-1 w-auto ">
           <label className="text-sm font-semibold text-gray-700">Invoice Number</label>
           <p className="border border-gray-400 rounded px-4 py-2 text-center text-gray-800">
             {invoiceNumber}

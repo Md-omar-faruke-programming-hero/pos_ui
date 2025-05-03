@@ -10,7 +10,7 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [vatAmount, setVatAmount] = useState<number>(0);
-
+  
   const [membership, setMembership] = useState<string>("");
 
   // Maximum Retail Price (MRP) fine here
@@ -98,6 +98,7 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
         setMembership,
         value,
         setValue,
+       
       }}
     >
       {children}
