@@ -131,20 +131,23 @@ export default function BillingSection() {
         payments: formattedPayments,
         sku: skuList,
       };
-      console.log("/sell/create-sell", payload);
+      
 
       try {
         const res = await api.post("/sell/create-sell", payload);
         console.log("✅ Sell created:", res.data);
         alert("Sell created successfully!");
         handleNextInvoice();
-        setProducts([]);
+        
         clearPOSState();
+        setProducts([]);
+        setRows([]);
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
       } finally {
         setLoading(false);
+        setProducts([]);
       }
     } else {
       alert("Need Amount");
