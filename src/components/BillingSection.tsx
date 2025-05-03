@@ -191,12 +191,18 @@ export default function BillingSection() {
       sku: skuList,
       timestamp: new Date().toISOString(), // i just keep it  for tracking purpose
     };
-
+      
+    const isvalid= products.length==0;
+    if(isvalid){
+      alert("Nothing to add ");
+      return;
+    }
     const heldSales = JSON.parse(localStorage.getItem("heldSales") || "[]");
     heldSales.push(payload);
     localStorage.setItem("heldSales", JSON.stringify(heldSales));
     handleNextInvoice();
     clearPOSState();
+    setRows([{ id: Date.now(), method: "", amount: "" }]);
     alert("Hold  successfully!");
   };
 
