@@ -108,6 +108,10 @@ export default function BillingSection() {
     }
   };
 
+  const clearProducts = () => {
+    setProducts([]);
+  };
+
   return (
     <div className="bg-white rounded shadow p-4">
       <div className="space-y-1">
@@ -213,7 +217,9 @@ export default function BillingSection() {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-4">
-        <button className="btn-red">Cancel & Clear</button>
+        <button onClick={clearProducts} className="btn-red cursor-pointer">
+          Cancel & Clear
+        </button>
         <button className="btn-green cursor-pointer" onClick={handleSubmit} disabled={loading}>
           {loading ? "Processing..." : "Add POS"}
         </button>
