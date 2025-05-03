@@ -13,8 +13,18 @@ export default function ProductCustomerNavigation() {
   //not found state
   const [notFound, setNotFound] = useState(false);
 
-  const { products, searchBySku,discountAmount,vatAmount, setDiscountAmount, setVatAmount, setMembership, value, setValue } =
-    useProductSearch();
+  const {
+    products,
+    searchBySku,
+    discountAmount,
+    vatAmount,
+    setDiscountAmount,
+    setVatAmount,
+    setMembership,
+    value,
+    setValue,
+    membership,
+  } = useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
   const { phone, setPhone, invoiceNumber } = useInvoice();
   // Filter only Salesmen
@@ -59,7 +69,6 @@ export default function ProductCustomerNavigation() {
     <div className="bg-white rounded shadow p-4 space-y-4">
       <h2 className="text-lg font-semibold">Product & Customer Navigation</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        
         <div className="flex flex-col space-y-1 w-auto ">
           <label className="text-sm font-semibold text-gray-700">Invoice Number</label>
           <p className="border border-gray-400 rounded px-4 py-2 text-center text-gray-800">
@@ -100,6 +109,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">MemberShipID</label>
           <input
+            value={membership}
             onChange={(e) => setMembership?.(e.target.value)}
             placeholder="MemberShipID"
             type="text"
@@ -143,7 +153,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Discount Amount</label>
           <input
-          value={discountAmount==0 ? "":discountAmount}
+            value={discountAmount == 0 ? "" : discountAmount}
             onChange={(e) => setDiscountAmount(Number(e.target.value))}
             placeholder="Enter The Discount Amount"
             type="text"
@@ -155,7 +165,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Vat Amount</label>
           <input
-          value={vatAmount==0 ? "":vatAmount }
+            value={vatAmount == 0 ? "" : vatAmount}
             onChange={(e) => setVatAmount(Number(e.target.value))}
             placeholder="Enter The Vat Amount"
             type="text"

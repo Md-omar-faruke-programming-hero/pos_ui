@@ -31,7 +31,7 @@ export type Product = {
     setDiscountAmount: React.Dispatch<React.SetStateAction<number>>;
     setVatAmount: React.Dispatch<React.SetStateAction<number>>;
     membership: string;
-    setMembership?: React.Dispatch<React.SetStateAction<string>>;
+    setMembership: React.Dispatch<React.SetStateAction<string>>;
     value: string;
     setValue: React.Dispatch<React.SetStateAction<string>>;
    

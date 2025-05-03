@@ -93,7 +93,7 @@ export default function BillingSection() {
   const clearPOSState = () => {
     setProducts([]);
     setPhone("");
-    setMembership?.("");
+    setMembership("");
     setDiscountAmount(0);
     setVatAmount(0);
     setSalesmanId(null);
@@ -131,17 +131,15 @@ export default function BillingSection() {
         payments: formattedPayments,
         sku: skuList,
       };
-      
 
       try {
         const res = await api.post("/sell/create-sell", payload);
         console.log("✅ Sell created:", res.data);
         alert("Sell created successfully!");
         handleNextInvoice();
-        
+
         clearPOSState();
         setProducts([]);
-        
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
@@ -157,11 +155,10 @@ export default function BillingSection() {
   const clearProducts = () => {
     setProducts([]);
     clearPOSState();
-   
   };
 
   // hold  handler
-  
+
   const handleHold = () => {
     const formattedProducts = products.map((p) => ({
       variationProductId: p.id,
@@ -237,9 +234,9 @@ export default function BillingSection() {
       skus: invoice.sku || [],
       subtotal: p.subTotal,
     }));
-    
+
     setProducts(mappedProducts);
-    setModalOpen(false)
+    setModalOpen(false);
   };
 
   const handleDelete = (timestamp: string) => {
@@ -336,17 +333,21 @@ export default function BillingSection() {
         </div>
         <div className="flex justify-between">
           <span>Total Received Amount</span>
-          <span>{totalReceived.toFixed(2)}৳</span>
+          {products.length == 0 ? <span>0৳</span> : <span>{totalReceived.toFixed(2)}৳</span>}
         </div>
         {totalReceived < payableAmount ? (
           <div className="flex justify-between font-semibold">
             <span>Need More</span>
-            <span>{Math.abs(changeAmount).toFixed(2)}৳</span>
+            {products.length == 0 ? (
+              <span>0৳</span>
+            ) : (
+              <span>{Math.abs(changeAmount).toFixed(2)}৳</span>
+            )}
           </div>
         ) : (
           <div className="flex justify-between font-semibold">
             <span>Change</span>
-            <span>{changeAmount.toFixed(2)}৳</span>
+            {products.length == 0 ? <span>0৳</span> : <span>{changeAmount.toFixed(2)}৳</span>}
           </div>
         )}
       </div>
