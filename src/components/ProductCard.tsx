@@ -44,7 +44,7 @@ export default function ProductCard({
                   onClick={() => onDeleteSKU(sku)}
                   title="Click to remove SKU"
                 >
-                  {sku}
+                  {sku.slice(-5)}
                 </span>
               ))
             ) : (
