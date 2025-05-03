@@ -156,6 +156,8 @@ export default function BillingSection() {
   // clear and cancel handler
   const clearProducts = () => {
     setProducts([]);
+    clearPOSState();
+    setRows([]);
   };
 
   // hold  handler
