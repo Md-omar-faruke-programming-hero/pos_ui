@@ -13,7 +13,7 @@ export default function ProductCustomerNavigation() {
   //not found state
   const [notFound, setNotFound] = useState(false);
 
-  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership, value, setValue } =
+  const { products, searchBySku,discountAmount,vatAmount, setDiscountAmount, setVatAmount, setMembership, value, setValue } =
     useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
   const { phone, setPhone, invoiceNumber } = useInvoice();
@@ -143,6 +143,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Discount Amount</label>
           <input
+          value={discountAmount==0 ? "":discountAmount}
             onChange={(e) => setDiscountAmount(Number(e.target.value))}
             placeholder="Enter The Discount Amount"
             type="text"
@@ -154,6 +155,7 @@ export default function ProductCustomerNavigation() {
         <div className="flex flex-col space-y-1 w-[auto]">
           <label className="text-sm font-semibold text-gray-700">Enter The Vat Amount</label>
           <input
+          value={vatAmount==0 ? "":vatAmount }
             onChange={(e) => setVatAmount(Number(e.target.value))}
             placeholder="Enter The Vat Amount"
             type="text"
