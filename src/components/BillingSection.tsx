@@ -25,10 +25,21 @@ export default function BillingSection() {
 
   const discountType = "Fixed";
 
-  const { products, setProducts, totalPrice, totalSKUs, discountAmount, vatAmount, payableAmount } =
-    useProductSearch();
-  const { invoiceNumber, handleNextInvoice, phone } = useInvoice();
-  const { salesmanId } = useEmployee();
+  const {
+    products,
+    setProducts,
+    totalPrice,
+    totalSKUs,
+    discountAmount,
+    vatAmount,
+    payableAmount,
+    setMembership,
+    setDiscountAmount,
+    setVatAmount,
+    setValue,
+  } = useProductSearch();
+  const { invoiceNumber, handleNextInvoice, phone, setPhone } = useInvoice();
+  const { salesmanId, setSalesmanId } = useEmployee();
 
   const totalReceived = rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0);
   const changeAmount = totalReceived - payableAmount;
@@ -57,6 +68,7 @@ export default function BillingSection() {
     setRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
 
+  // add pos handler
   const handleSubmit = async () => {
     if (totalReceived >= payableAmount) {
       setLoading(true);
@@ -107,9 +119,58 @@ export default function BillingSection() {
       alert("Need Amount");
     }
   };
-
+  // clear and cancel handler
   const clearProducts = () => {
     setProducts([]);
+  };
+
+  // hold  handler
+  const clearPOSState = () => {
+    setProducts([]);
+    setPhone("");
+    setMembership?.("");
+    setDiscountAmount(0);
+    setVatAmount(0);
+    setSalesmanId(null);
+    setValue("");
+  };
+  const handleHold = () => {
+    const formattedProducts = products.map((p) => ({
+      variationProductId: p.id,
+      quantity: p.skus.length,
+      unitPrice: p.discountPrice,
+      discount: p.sellPrice - p.discountPrice,
+      subTotal: p.subtotal,
+    }));
+
+    const formattedPayments = rows.map((r) => ({
+      paymentAmount: parseFloat(r.amount),
+      accountId: accounts.find((a) => a.bankName === r.method)?.id || 0,
+    }));
+
+    const skuList = products.flatMap((p) => (Array.isArray(p.skus) ? p.skus : []));
+    const payload = {
+      invoiceNo: invoiceNumber,
+      salesmenId: salesmanId,
+      discountType,
+      discount: discountAmount,
+      phone,
+      totalPrice,
+      totalPaymentAmount: totalReceived,
+      changeAmount,
+      vat: vatAmount,
+      products: formattedProducts,
+      payments: formattedPayments,
+      sku: skuList,
+      timestamp: new Date().toISOString(), // i just keep it  for tracking purpose
+    };
+
+    const heldSales = JSON.parse(localStorage.getItem("heldSales") || "[]");
+    heldSales.push(payload);
+    localStorage.setItem("heldSales", JSON.stringify(heldSales));
+    handleNextInvoice();
+    clearPOSState();
+    alert("Hold  successfully!");
   };
 
   return (
@@ -205,7 +266,7 @@ export default function BillingSection() {
         </div>
         {totalReceived < payableAmount ? (
           <div className="flex justify-between font-semibold">
-            <span>Need</span>
+            <span>Need More</span>
             <span>{Math.abs(changeAmount).toFixed(2)}৳</span>
           </div>
         ) : (
@@ -223,7 +284,9 @@ export default function BillingSection() {
         <button className="btn-green cursor-pointer" onClick={handleSubmit} disabled={loading}>
           {loading ? "Processing..." : "Add POS"}
         </button>
-        <button className="btn-dark">Hold</button>
+        <button onClick={handleHold} className="btn-dark">
+          Hold
+        </button>
         <button className="btn-brown">Hold List</button>
         <button className="btn-gray">Quotation</button>
         <button className="btn-light">Reattempt</button>

@@ -6,6 +6,7 @@ import { Product, ProductSearchContextType } from "./productTypes";
 const ProductSearchContext = createContext<ProductSearchContextType | undefined>(undefined);
 
 export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [value, setValue] = useState<string>("");
   const [products, setProducts] = useState<Product[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [vatAmount, setVatAmount] = useState<number>(0);
@@ -95,6 +96,8 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
         vatAmount,
         membership,
         setMembership,
+        value,
+        setValue,
       }}
     >
       {children}

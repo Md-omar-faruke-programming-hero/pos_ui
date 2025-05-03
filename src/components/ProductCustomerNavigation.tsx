@@ -4,7 +4,7 @@ import { useEmployee } from "../context/employeeContext";
 import { useInvoice } from "../context/invoiceContext";
 
 export default function ProductCustomerNavigation() {
-  const [value, setValue] = useState("");
+  
   //  loding state
   const [isLoading, setIsLoading] = useState(false);
   //  check allredy added state
@@ -14,7 +14,7 @@ export default function ProductCustomerNavigation() {
   //not found state
   const [notFound, setNotFound] = useState(false);
 
-  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership } =
+  const { products, searchBySku, setDiscountAmount, setVatAmount, setMembership,value, setValue } =
     useProductSearch();
   const { employees, salesmanId, setSalesmanId } = useEmployee();
   const { invoiceNumber, phone, setPhone } = useInvoice();
