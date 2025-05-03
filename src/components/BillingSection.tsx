@@ -90,6 +90,15 @@ export default function BillingSection() {
   };
 
   // add pos handler
+  const clearPOSState = () => {
+    setProducts([]);
+    setPhone("");
+    setMembership?.("");
+    setDiscountAmount(0);
+    setVatAmount(0);
+    setSalesmanId(null);
+    setValue("");
+  };
   const handleSubmit = async () => {
     if (totalReceived >= payableAmount) {
       setLoading(true);
@@ -130,6 +139,7 @@ export default function BillingSection() {
         alert("Sell created successfully!");
         handleNextInvoice();
         setProducts([]);
+        clearPOSState();
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
@@ -146,15 +156,7 @@ export default function BillingSection() {
   };
 
   // hold  handler
-  const clearPOSState = () => {
-    setProducts([]);
-    setPhone("");
-    setMembership?.("");
-    setDiscountAmount(0);
-    setVatAmount(0);
-    setSalesmanId(null);
-    setValue("");
-  };
+  
   const handleHold = () => {
     const formattedProducts = products.map((p) => ({
       variationProductId: p.id,
