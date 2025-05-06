@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { api } from "../api";
+import React, { createContext, useContext, useState /* useEffect */ } from "react";
+// import { api } from "../api"; // ❌ API not needed if using static data
 
 type Employee = {
   id: number;
@@ -7,7 +7,7 @@ type Employee = {
   lastName: string | null;
   phone: string;
   name: string;
-  avatar?: string;
+  
   employeeDesignation?: {
     id: number;
     designation: string;
@@ -23,34 +23,59 @@ type EmployeeContextType = {
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
+// ✅ Static employee list instead of fetching from API
+const staticEmployees: Employee[] = [
+  {
+    id: 9,
+    firstName: "Rifat",
+    lastName: null,
+    name: "Rifat",
+    phone: "01850557056",
+    
+    employeeDesignation: {
+      id: 4,
+      designation: "Salesman",
+    },
+  },
+  
+];
+
 export const EmployeeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [salesmen, setSalesmen] = useState<Employee[]>([]);
+  // const [employees, setEmployees] = useState<Employee[]>([]);
+  // const [salesmen, setSalesmen] = useState<Employee[]>([]);
   const [salesmanId, setSalesmanId] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await api.get("/employee/get-employee-all");
-        const allEmployees = res.data.data || [];
+  // ❌ No need to fetch if using static data
+  // useEffect(() => {
+  //   const fetchEmployees = async () => {
+  //     try {
+  //       const res = await api.get("/employee/get-employee-all");
+  //       const allEmployees = res.data.data || [];
+  //       setEmployees(allEmployees);
+  //       const filteredSalesmen = allEmployees.filter(
+  //         (emp: Employee) => emp.employeeDesignation?.designation === "Salesman"
+  //       );
+  //       setSalesmen(filteredSalesmen);
+  //     } catch (err) {
+  //       console.error("Failed to fetch employees", err);
+  //     }
+  //   };
+  //   fetchEmployees();
+  // }, []);
 
-        setEmployees(allEmployees);
-
-        // Filter only "Salesman"
-        const filteredSalesmen = allEmployees.filter(
-          (emp: Employee) => emp.employeeDesignation?.designation === "Salesman"
-        );
-        setSalesmen(filteredSalesmen);
-      } catch (err) {
-        console.error("Failed to fetch employees", err);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
+  const salesmen = staticEmployees.filter(
+    (emp) => emp.employeeDesignation?.designation === "Salesman"
+  );
 
   return (
-    <EmployeeContext.Provider value={{ employees, salesmen, salesmanId, setSalesmanId }}>
+    <EmployeeContext.Provider
+      value={{
+        employees: staticEmployees,
+        salesmen,
+        salesmanId,
+        setSalesmanId,
+      }}
+    >
       {children}
     </EmployeeContext.Provider>
   );

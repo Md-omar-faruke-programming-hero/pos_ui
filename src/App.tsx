@@ -12,6 +12,8 @@ export default function App() {
         <ProductInfoList />
         <BillingSection />
       </div>
+
+      <p>Search Product BarCode like : 01007-00025, 01007-00026, 01007-00143, 01007-00144, 01004-00015, 01004-00016</p>
     </div>
   );
 }

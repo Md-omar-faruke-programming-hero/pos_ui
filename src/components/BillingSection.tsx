@@ -3,7 +3,7 @@ import { Trash2, Plus } from "lucide-react";
 import { useProductSearch } from "../context/ProductSearchContext";
 import { useInvoice } from "../context/invoiceContext";
 
-import { api } from "../api";
+//  import { api } from "../api";
 import { useEmployee } from "../context/employeeContext";
 import { HoldListModal, HoldInvoice } from "./HoldListModal";
 // import type { Product as ContextProduct } from "../context/productTypes";
@@ -65,16 +65,45 @@ export default function BillingSection() {
   const totalReceived = rows.reduce((total, r) => total + (parseFloat(r.amount) || 0), 0);
   const changeAmount = totalReceived - payableAmount;
 
+  // useEffect(() => {
+  //   const fetchAccounts = async () => {
+  //     try {
+  //       const res = await api.get("/account/get-accounts?type=All");
+  //       setAccounts(res.data?.data || []);
+  //     } catch (error) {
+  //       console.error("Failed to fetch payment methods:", error);
+  //     }
+  //   };
+  //   fetchAccounts();
+  // }, []);
   useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const res = await api.get("/account/get-accounts?type=All");
-        setAccounts(res.data?.data || []);
-      } catch (error) {
-        console.error("Failed to fetch payment methods:", error);
-      }
-    };
-    fetchAccounts();
+    setAccounts([
+      {
+        id: 1,
+        bankName: "Bank of America",
+        accountName: "John Doe",
+      },
+      {
+        id: 2,
+        bankName: "Chase Bank",
+        accountName: "Jane Smith",
+      },
+      {
+        id: 3,
+        bankName: "Wells Fargo",
+        accountName: "Emily Davis",
+      },
+      {
+        id: 7,
+        bankName: "Nagad",
+        accountName: "Nagad Account",
+      },
+      {
+        id: 2,
+        bankName: "Cash",
+        accountName: "Cash Account",
+      },
+    ]);
   }, []);
 
   const addRow = () => {
@@ -134,14 +163,17 @@ export default function BillingSection() {
       };
 
       try {
-        const res = await api.post("/sell/create-sell", payload);
-        console.log("✅ Sell created:", res.data);
-        alert("Sell created successfully!");
-        handleNextInvoice();
+        //  const res = await api.post("/sell/create-sell", payload);
+        //  console.log("✅ Sell created:", res.data);
+      
+        if (products.length !== 0) {
+          alert("Sell created successfully!");
+          handleNextInvoice();
 
-        clearPOSState();
-        setProducts([]);
-        setRows([{ id: Date.now(), method: "", amount: "" }]);
+          clearPOSState();
+          setProducts([]);
+          setRows([{ id: Date.now(), method: "", amount: "" }]);
+        }
       } catch (err) {
         console.error("❌ Sell submission failed:", err);
         alert("Sell failed. See console for details.");
@@ -192,9 +224,9 @@ export default function BillingSection() {
       sku: skuList,
       timestamp: new Date().toISOString(), // i just keep it  for tracking purpose
     };
-      
-    const isvalid= products.length==0;
-    if(isvalid){
+
+    const isvalid = products.length == 0;
+    if (isvalid) {
       alert("Nothing to add on hold");
       return;
     }
@@ -226,10 +258,10 @@ export default function BillingSection() {
   const handleRestore = (invoice: HoldInvoice) => {
     console.log(invoice);
     const mappedProducts: Product[] = invoice.products.map((p) => ({
-      id: p.variationProductId, 
+      id: p.variationProductId,
       branchId: 0,
       productId: 0,
-      productName: "", 
+      productName: "",
       size: "",
       color: null,
       stock: 0,
@@ -244,10 +276,10 @@ export default function BillingSection() {
       skus: invoice.sku || [],
       subtotal: p.subTotal,
     }));
-   
+
     setProducts(mappedProducts);
-    setRestorinv(invoice.invoiceNo)
-   
+    setRestorinv(invoice.invoiceNo);
+
     setModalOpen(false);
   };
 

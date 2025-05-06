@@ -1,7 +1,123 @@
 // productSearchContext.tsx
 import React, { createContext, useState, useContext } from "react";
-import { api } from "../api";
+//import { api } from "../api";
 import { Product, ProductSearchContextType } from "./productTypes";
+const dummyProducts = [
+  {
+    id: 11,
+    variationProductId: 11,
+    branchId: 3,
+    productName: "SL-101",
+    productId: 7,
+    sku: "01007-00025",
+    size: "xl",
+    color: null,
+    stock: 138,
+    category: "Pant",
+    subCategory: "Formal Pant",
+    price: 100,
+    sellPrice: 1200,
+    discount: 0,
+    discountPrice: 1200,
+    wholePrice: 1200,
+    unique: true,
+  },
+  {
+    id: 12,
+    variationProductId: 12,
+    branchId: 3,
+    productName: "SL-101",
+    productId: 7,
+    sku: "01007-00026",
+    size: "xl",
+    color: null,
+    stock: 140,
+    category: "Pant",
+    subCategory: "Formal Pant",
+    price: 105,
+    sellPrice: 1250,
+    discount: 2,
+    discountPrice: 1225,
+    wholePrice: 1225,
+    unique: true,
+  },
+  {
+    id: 13,
+    variationProductId: 13,
+    branchId: 3,
+    productName: "SL-101",
+    productId: 7,
+    sku: "01007-00143",
+    size: "l",
+    color: null,
+    stock: 125,
+    category: "Pant",
+    subCategory: "Formal Pant",
+    price: 98,
+    sellPrice: 1100,
+    discount: 3,
+    discountPrice: 1067,
+    wholePrice: 1067,
+    unique: true,
+  },
+  {
+    id: 14,
+    variationProductId: 14,
+    branchId: 3,
+    productName: "SL-202",
+    productId: 8,
+    sku: "01007-00144",
+    size: "xl",
+    color: null,
+    stock: 80,
+    category: "Pant",
+    subCategory: "Casual Pant",
+    price: 115,
+    sellPrice: 1300,
+    discount: 5,
+    discountPrice: 1235,
+    wholePrice: 1235,
+    unique: true,
+  },
+  {
+    id: 15,
+    variationProductId: 15,
+    branchId: 3,
+    productName: "SL-202",
+    productId: 8,
+    sku: "01004-00015",
+    size: "l",
+    color: null,
+    stock: 75,
+    category: "Pant",
+    subCategory: "Casual Pant",
+    price: 110,
+    sellPrice: 1280,
+    discount: 8,
+    discountPrice: 1177.6,
+    wholePrice: 1177.6,
+    unique: true,
+  },
+  {
+    id: 16,
+    variationProductId: 16,
+    branchId: 3,
+    productName: "SL-303",
+    productId: 9,
+    sku: "01004-00016",
+    size: "xl",
+    color: null,
+    stock: 90,
+    category: "Pant",
+    subCategory: "Jogger Pant",
+    price: 120,
+    sellPrice: 1400,
+    discount: 10,
+    discountPrice: 1260,
+    wholePrice: 1260,
+    unique: true,
+  },
+];
 
 const ProductSearchContext = createContext<ProductSearchContextType | undefined>(undefined);
 
@@ -10,7 +126,7 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [vatAmount, setVatAmount] = useState<number>(0);
-  
+
   const [membership, setMembership] = useState<string>("");
 
   // Maximum Retail Price (MRP) fine here
@@ -22,11 +138,7 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const searchBySku = async (sku: string) => {
     try {
-      const res = await api.get("/purchase/get-purchase-single", {
-        params: { search: sku },
-      });
-
-      const found = res.data.data?.[0];
+      const found = dummyProducts.find((item) => item.sku === sku);
       if (!found) {
         throw new Error("Product not found");
       }
@@ -98,7 +210,6 @@ export const ProductSearchProvider: React.FC<{ children: React.ReactNode }> = ({
         setMembership,
         value,
         setValue,
-       
       }}
     >
       {children}
