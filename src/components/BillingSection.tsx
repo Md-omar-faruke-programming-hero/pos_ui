@@ -165,9 +165,10 @@ export default function BillingSection() {
       try {
         //  const res = await api.post("/sell/create-sell", payload);
         //  console.log("✅ Sell created:", res.data);
-      
+
         if (products.length !== 0) {
-          alert("Sell created successfully!");
+          alert(`Sell created successfully!\n${JSON.stringify(payload, null, 2)}`);
+
           handleNextInvoice();
 
           clearPOSState();
