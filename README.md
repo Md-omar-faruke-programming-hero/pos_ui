@@ -58,9 +58,3 @@ According to the instructions from the provided videos:
 npm install
 npm run dev
 
-## 🖼️ UI Screenshot
-
-### Task-Based POS UI
-
-![POS UI](screenshots.JPG)
-
